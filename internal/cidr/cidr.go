@@ -106,7 +106,9 @@ func ParseCIDR(s string) (block Block, orig uint32, err error) {
 	if convErr != nil {
 		return Block{}, 0, ErrInvalidPrefix
 	}
-	if prefix < 0 || prefix > 31 {
+	// 前缀长度合法范围为 0–32：/0 为全空间，/32 为单主机地址块。
+	// 此前误用 > 31 会导致 /32 被当作非法前缀拒绝。
+	if prefix < 0 || prefix > 32 {
 		return Block{}, 0, ErrInvalidPrefix
 	}
 	ip, ipErr := ParseIPv4(ipStr)
